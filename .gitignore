@@ -1,0 +1,14 @@
+/.vscode
+/Data
+/DataCheck
+/StockEvents
+/data_long_term_sets
+/data_long_term_sets_summary
+/data_sets
+/data_sets_for_learning
+/data_sets_summary
+/MergedData
+/merged_data_with_indicators
+/merged_data_with_vp
+/__pycache__
+SECRETS.py
