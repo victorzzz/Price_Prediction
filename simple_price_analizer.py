@@ -66,7 +66,6 @@ def calculateDayPriceChangeWithTrailingStopLoss(
     l_prices = len(prices)
     l_losses = len(trailingStopLosses)
 
-    # day_borders = np.where( ((np.diff(days, prepend=np.nan) != 0) | (np.diff(days, append=np.nan) != 0)), 1, 0)
     day_borders = np.where( (np.diff(days, append=np.nan) != 0), 1, 0)
 
     day_borders_intervals = getCheckPointsIntervals(day_borders)

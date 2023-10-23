@@ -1,4 +1,3 @@
-from math import isnan
 import constants as cnts
 import pandas as pd
 import multiprocessing
@@ -15,14 +14,14 @@ def read_merged_csv_files(tickers:Iterable[str]):
 
     data_frames_result = {}
 
-    for tiker in tickers:
+    for ticker in tickers:
         
         minute_multiplier = 1
         
-        file_name = f"{cnts.merged_data_folder}/{tiker}--price-candle--{minute_multiplier}--minute.csv"
-        df = pd.read_csv(f"{file_name}")
-        key = (tiker, minute_multiplier, "minute")
-        add_fields(tiker, df)
+        file_name = f"{cnts.merged_data_folder}/{ticker}--price-candle--{minute_multiplier}--minute.csv"
+        df = pd.read_csv(file_name)
+        key = (ticker, minute_multiplier, "minute")
+        add_fields(ticker, df)
         df = df.copy()
         data_frames_result[key] = df
 

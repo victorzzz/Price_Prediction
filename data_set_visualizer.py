@@ -61,6 +61,6 @@ def visualize_dataset(
 
 
     #drawPricesAndGains(df['vwap'].values[-1000:], gains[:,-1000:], cnts.loss_levels)
-    drawPricesAndGains(df['vwap'].values, gains[-9:,:], cnts.loss_levels[-9:])
+    drawPricesAndGains(df['vwap'].values, gains[-12:-11,:], cnts.loss_levels[-12:-11])
 
-visualize_dataset("MSFT", True)
+visualize_dataset("RY", True)

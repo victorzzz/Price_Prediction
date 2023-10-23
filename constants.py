@@ -23,6 +23,9 @@ long_term_buy_thresholds = (0.021, 0.035, 0.049)
 loss_levels = np.array([0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875, 2.0])
 gain_levels = np.array([0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875, 2.0, 2.125, 2.25, 2.375, 2.5, 2.625, 2.75, 2.875, 3.0])
 
+loss_level_for_training = 0.625
+gain_level_for_training = 1.125
+
 ticker_groups = {
     "bank_financial": ("RY", "TD", "BNS", "BMO", "CM", "MFC", "SLF", "BAM"),
     "tech_software": ("SHOP", "OTEX", "CDAY", "TRI" ),
@@ -66,7 +69,7 @@ data_sets_summary_folder = "data_sets_summary"
 data_long_term_sets_folder = "data_long_term_sets"
 data_long_term_sets_summary_folder = "data_long_term_sets_summary"
 
-data_sets_for_learning_folder = "data_sets_for_learning"
+data_sets_for_training_folder = "data_sets_for_training"
 
 merged_data_with_indicators_folder = "merged_data_with_indicators"
 merged_data_with_vp_folder = "merged_data_with_vp"
