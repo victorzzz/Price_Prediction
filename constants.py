@@ -56,6 +56,8 @@ def get_all_tickets_batches_list(batch_size:int) -> List[List[str]]:
 def get_all_tickets_batches(batch_size:int) -> Generator[List[str], None, None]:
     return batch_generator(get_all_tickers(), batch_size)
 
+complex_processing_batch_size = 7
+
 data_folder = "Data"
 merged_data_folder = "MergedData"
 data_check_folder = "DataCheck"

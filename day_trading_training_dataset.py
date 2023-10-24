@@ -4,16 +4,21 @@ import multiprocessing
 import simple_price_analizer as spa
 import numpy as np
 
-def read_dataset_csv_file(ticker:str): 
-    minute_multiplier = 1
-        
+def read_dataset_csv_file(ticker:str):    
     file_name = f"{cnts.data_sets_folder}/{ticker}.csv"
+    df = pd.read_csv(file_name)
+
+    return df
+
+def read_indicators_csv_file(ticker:str):
+    file_name = f"{cnts.merged_data_with_vp_folder}/{ticker}--volume_profile--1--minute.csv"
     df = pd.read_csv(file_name)
 
     return df
 
 def build_training_dataset_for_ticker(tiker:str):
     df_dataset = read_dataset_csv_file(tiker)
+    df_indicator = read_indicators_csv_file(tiker)
     
 
 # ----------------------------
@@ -21,7 +26,7 @@ def build_training_dataset_for_ticker(tiker:str):
 def do_step():
     processes = []
 
-    for tikers_batch in cnts.get_all_tickets_batches(14):
+    for tikers_batch in cnts.get_all_tickets_batches(cnts.complex_processing_batch_size):
         print("-------------------------------------")
         print(f"Day tradig training dataset. Processing group '{', '.join(tikers_batch)}' ...")
         print("-------------------------------------")

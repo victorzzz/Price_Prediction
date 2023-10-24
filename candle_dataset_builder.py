@@ -70,7 +70,7 @@ def build_dataset_for_ticker(tiker:str):
 def do_step():
     processes = []
 
-    for tikers_batch in cnts.get_all_tickets_batches(14):
+    for tikers_batch in cnts.get_all_tickets_batches(cnts.complex_processing_batch_size):
         print("-------------------------------------")
         print(f"Date tradig dataset. Processing group '{', '.join(tikers_batch)}' ...")
         print("-------------------------------------")

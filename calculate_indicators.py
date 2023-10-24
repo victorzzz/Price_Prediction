@@ -96,7 +96,7 @@ def calculate_indicatorsfor_ticker(ticker):
 def do_step():
     processes = []
 
-    for tikers_batch in cnts.get_all_tickets_batches(14):
+    for tikers_batch in cnts.get_all_tickets_batches(cnts.complex_processing_batch_size):
         print("-------------------------------------")
         print(f"Indicators. Processing group '{', '.join(tikers_batch)}' ...")
         print("-------------------------------------")

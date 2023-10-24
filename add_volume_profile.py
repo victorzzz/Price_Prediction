@@ -96,7 +96,6 @@ def calculate_volume_profile(df:pd.DataFrame, multiplier:int, print_time:bool = 
         
     return df
 
-
 def add_vcalculate_volume_profiles(ticker:str):
     file_name = f"{cnts.merged_data_folder}/{ticker}--price-candle--1--minute.csv"
     print(f"Reading {file_name}")    
@@ -119,14 +118,14 @@ def add_vcalculate_volume_profiles(ticker:str):
     file_name_to_save = f"{cnts.merged_data_with_vp_folder}/{ticker}--volume_profile--1--minute.csv"
 
     print(f"Saving {file_name_to_save}")
-    df.to_csv(f"{file_name_to_save}")
+    df.to_csv(file_name_to_save)
 
 # ----------------------------
 
 def do_step():
     processes = []
 
-    for tikers_batch in cnts.get_all_tickets_batches(14):
+    for tikers_batch in cnts.get_all_tickets_batches(cnts.complex_processing_batch_size):
         print("-------------------------------------")
         print(f"Volume Profile. Processing group '{', '.join(tikers_batch)}' ...")
         print("-------------------------------------")
