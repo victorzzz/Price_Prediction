@@ -4,7 +4,7 @@ import pandas as pd
 from os.path import exists
 import time
 import constants as cnts
-import secrets as secrets
+import SECRETS as secrets
 
 from_date = dt.datetime.now().date()
 
@@ -107,4 +107,5 @@ def do_step():
         for multiplier in cnts.day_multipliers:
             download_stock_bars(from_date, two_years_days, client, ticker, multiplier, "day", meta_to_day)
 
-
+if __name__ == "__main__":
+    do_step()

@@ -97,32 +97,47 @@ def calculate_volume_profile(df:pd.DataFrame, multiplier:int, print_time:bool = 
     return df
 
 def add_vcalculate_volume_profiles(ticker:str):
-    file_name = f"{cnts.merged_data_folder}/{ticker}--price-candle--1--minute.csv"
-    print(f"Reading {file_name}")    
-    df = pd.read_csv(f"{file_name}")
+    merged_data_file_name = f"{cnts.merged_data_folder}/{ticker}--price-candle--1--minute.csv"
+    print(f"Reading {merged_data_file_name}")    
+    merged_data_df = pd.read_csv(f"{merged_data_file_name}")
+
+    merged_data_with_vp_file_name = f"{cnts.merged_data_with_vp_folder}/{ticker}--volume_profile--1--minute.csv"
+
+    # get last date of merged data with volume profile
+    if cnts.is_file_exists(merged_data_with_vp_file_name):
+        merged_data_with_vp_df = pd.read_csv(merged_data_with_vp_file_name)
+        last_timestamp = merged_data_with_vp_df.iloc[-1]['timestamp']
+        merged_data_df = merged_data_df[merged_data_df['timestamp'] > last_timestamp].copy()
+
+        # return if there is no new data
+        if merged_data_df.shape[0] == 0:
+            print(f"No new data for {ticker}")
+            return
     
     # dropping unnecesary fields
-    df.drop('open', axis=1)
-    df.drop('high', axis=1)
-    df.drop('low', axis=1)
-    df.drop('close', axis=1)
-    df.drop('transactions', axis=1)
-    df.drop('otc', axis=1)
+    merged_data_df.drop('open', axis=1)
+    merged_data_df.drop('high', axis=1)
+    merged_data_df.drop('low', axis=1)
+    merged_data_df.drop('close', axis=1)
+    merged_data_df.drop('transactions', axis=1)
+    merged_data_df.drop('otc', axis=1)
 
-    df = df.copy()
+    merged_data_df = merged_data_df.copy()
 
     print(f"Creating valume profiles")
 
-    df = calculate_volume_profile(df, 1)
+    merged_data_df = calculate_volume_profile(merged_data_df, 1)
 
-    file_name_to_save = f"{cnts.merged_data_with_vp_folder}/{ticker}--volume_profile--1--minute.csv"
+    merged_data_df = pd.concat([merged_data_with_vp_df, merged_data_df], axis=0, ignore_index=True)
 
-    print(f"Saving {file_name_to_save}")
-    df.to_csv(file_name_to_save)
+    print(f"Saving {merged_data_with_vp_file_name}")
+    merged_data_df.to_csv(merged_data_with_vp_file_name)
 
 # ----------------------------
 
 def do_step():
+
+    """
     processes = []
 
     for tikers_batch in cnts.get_all_tickets_batches(cnts.complex_processing_batch_size):
@@ -139,8 +154,9 @@ def do_step():
         print(f"Waiting for '{', '.join(tikers_batch)}' ...")
         for process in processes:
             process.join()
+    """
 
+    add_vcalculate_volume_profiles("RY")
 
 if __name__ == "__main__":
-    
     do_step()

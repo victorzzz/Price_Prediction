@@ -56,7 +56,7 @@ def get_all_tickets_batches_list(batch_size:int) -> List[List[str]]:
 def get_all_tickets_batches(batch_size:int) -> Generator[List[str], None, None]:
     return batch_generator(get_all_tickers(), batch_size)
 
-complex_processing_batch_size = 7
+complex_processing_batch_size = 12
 
 data_folder = "Data"
 merged_data_folder = "MergedData"
@@ -77,6 +77,9 @@ merged_data_with_indicators_folder = "merged_data_with_indicators"
 merged_data_with_vp_folder = "merged_data_with_vp"
 
 stock_events_folder = "StockEvents"
+
+def is_file_exists(file_path:str) -> bool:
+    return os.path.isfile(file_path)
 
 def get_file_creation_datetime(file_path:str) -> datetime:
     # Get file metadata
