@@ -5,7 +5,7 @@ import constants as cnts
 import pandas as pd
 import numpy as np
 
-def calculate_volume_profile(df:pd.DataFrame, multiplier:int, print_time:bool = False) -> pd.DataFrame:
+def calculate_volume_profile(df:pd.DataFrame, multiplier:int, calculate_for_last_records:int = -1, print_time:bool = False) -> pd.DataFrame:
     vwap = df['vwap'].to_numpy(copy=True)
     volume = df['volume'].to_numpy(copy=True)
 
@@ -96,23 +96,29 @@ def calculate_volume_profile(df:pd.DataFrame, multiplier:int, print_time:bool = 
         
     return df
 
-def add_vcalculate_volume_profiles(ticker:str):
+def add_volume_profiles(ticker:str):
     merged_data_file_name = f"{cnts.merged_data_folder}/{ticker}--price-candle--1--minute.csv"
     print(f"Reading {merged_data_file_name}")    
     merged_data_df = pd.read_csv(f"{merged_data_file_name}")
+
+    records_in_merged_data = merged_data_df.shape[0]
 
     merged_data_with_vp_file_name = f"{cnts.merged_data_with_vp_folder}/{ticker}--volume_profile--1--minute.csv"
 
     # get last date of merged data with volume profile
     if cnts.is_file_exists(merged_data_with_vp_file_name):
         merged_data_with_vp_df = pd.read_csv(merged_data_with_vp_file_name)
-        last_timestamp = merged_data_with_vp_df.iloc[-1]['timestamp']
-        merged_data_df = merged_data_df[merged_data_df['timestamp'] > last_timestamp].copy()
+        
+        records_with_vp = merged_data_with_vp_df.shape[0]
 
         # return if there is no new data
-        if merged_data_df.shape[0] == 0:
-            print(f"No new data for {ticker}")
+        if merged_data_df.shape[0] <= records_with_vp: 
+            print(f"No new data for {ticker}. Number of records in merged data {records_in_merged_data}, number of records with volume profile {records_with_vp}")
             return
+        
+        records_to_calculate_vp = records_in_merged_data - records_with_vp
+
+        print(f"for {ticker}: ")
     
     # dropping unnecesary fields
     merged_data_df.drop('open', axis=1)
@@ -126,9 +132,9 @@ def add_vcalculate_volume_profiles(ticker:str):
 
     print(f"Creating valume profiles")
 
-    merged_data_df = calculate_volume_profile(merged_data_df, 1)
+    merged_data_df = calculate_volume_profile(merged_data_df, 1, calculate_for_last_records=records_to_calculate_vp)
 
-    merged_data_df = pd.concat([merged_data_with_vp_df, merged_data_df], axis=0, ignore_index=True)
+    merged_data_df = pd.concat([merged_data_with_vp_df, merged_data_df.tail(records_to_calculate_vp)], axis=0, ignore_index=True)
 
     print(f"Saving {merged_data_with_vp_file_name}")
     merged_data_df.to_csv(merged_data_with_vp_file_name)
@@ -146,7 +152,7 @@ def do_step():
         print("-------------------------------------")
 
         for tiker in tikers_batch:
-            process = multiprocessing.Process(target=add_vcalculate_volume_profiles, args=(tiker,))
+            process = multiprocessing.Process(target=add_volume_profiles, args=(tiker,))
             processes.append(process)
             process.start()
 
@@ -156,7 +162,7 @@ def do_step():
             process.join()
     """
 
-    add_vcalculate_volume_profiles("RY")
+    add_volume_profiles("RY")
 
 if __name__ == "__main__":
     do_step()

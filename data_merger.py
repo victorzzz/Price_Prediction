@@ -78,7 +78,7 @@ def merge_csv_files(
 def do_step():
     processes = []
 
-    for tikers_batch in cnts.get_all_tickets_batches(6):
+    for tikers_batch in cnts.get_all_tickets_batches(cnts.complex_processing_batch_size):
         print("-------------------------------------")
         print(f"Processing group '{', '.join(tikers_batch)}' ...")
         print("-------------------------------------")
