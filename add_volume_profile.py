@@ -9,6 +9,8 @@ def calculate_volume_profile(df:pd.DataFrame, multiplier:int, calculate_for_last
     vwap = df['vwap'].to_numpy(copy=True)
     volume = df['volume'].to_numpy(copy=True)
 
+    total_records = df.shape[0]
+
     for depth in cnts.volume_profile_depths:
 
         print(f"VP depth:{depth}")
@@ -42,9 +44,7 @@ def calculate_volume_profile(df:pd.DataFrame, multiplier:int, calculate_for_last
         print(" ")
         print(" ")
 
-        for index, row in df.iterrows():
-          if (index < depth):
-              continue
+        for index in range(total_records - calculate_for_last_records, total_records):
 
           start_getting_time = time.time()
           
@@ -62,7 +62,11 @@ def calculate_volume_profile(df:pd.DataFrame, multiplier:int, calculate_for_last
 
           hist, bins = np.histogram(vwap_for_volume_profile, bins=num_bins, weights=volume_for_volume_profile)
 
-          hist = hist / sum(hist)
+          sum_hist = sum(hist)
+          if (sum_hist != 0):
+            hist = hist / sum_hist
+          else:
+              print(f"Sum of hist is 0 for index {index}")
 
           sorted_indices = np.argsort(hist)[::-1]
           sorted_hist = hist[sorted_indices]
@@ -75,13 +79,15 @@ def calculate_volume_profile(df:pd.DataFrame, multiplier:int, calculate_for_last
 
           start_field_adding_time = time.time()
 
-          df.loc[index, f'vp_{multiplier}_{depth}_width'] = round(bins[1] - bins[0], 4)
+          df.loc[index, f'vp_{multiplier}_{depth}_width'] = f'{bins[1] - bins[0]:.6e}'
 
           for histogram_index, item in enumerate(zip(sorted_bins_start, sorted_hist)):
               bin_start, histogram_volume = item
-              df.loc[index, f'vp_{multiplier}_{depth}_{histogram_index}_price'] = round(bin_start, 4)
-              df.loc[index, f'vp_{multiplier}_{depth}_{histogram_index}_volume'] = round(histogram_volume, 6)
-          
+
+              df.loc[index, f'vp_{multiplier}_{depth}_{histogram_index}_price'] = f'{bin_start:.6e}'
+              df.loc[index, f'vp_{multiplier}_{depth}_{histogram_index}_volume'] = '0.0' if histogram_volume == 0.0 else f'{histogram_volume:.6e}'
+
+
           end_field_adding_time = time.time()
 
           total_adding_time += end_field_adding_time - start_field_adding_time
@@ -105,7 +111,8 @@ def add_volume_profiles(ticker:str):
 
     merged_data_with_vp_file_name = f"{cnts.merged_data_with_vp_folder}/{ticker}--volume_profile--1--minute.csv"
 
-    # get last date of merged data with volume profile
+    merged_data_with_vp_df = None
+
     if cnts.is_file_exists(merged_data_with_vp_file_name):
         merged_data_with_vp_df = pd.read_csv(merged_data_with_vp_file_name)
         
@@ -118,8 +125,10 @@ def add_volume_profiles(ticker:str):
         
         records_to_calculate_vp = records_in_merged_data - records_with_vp
 
-        print(f"for {ticker}: ")
-    
+        print(f"For {ticker} records to calculate VP: {records_to_calculate_vp}")
+    else:
+        records_to_calculate_vp = records_in_merged_data
+
     # dropping unnecesary fields
     merged_data_df.drop('open', axis=1)
     merged_data_df.drop('high', axis=1)
@@ -132,9 +141,10 @@ def add_volume_profiles(ticker:str):
 
     print(f"Creating valume profiles")
 
-    merged_data_df = calculate_volume_profile(merged_data_df, 1, calculate_for_last_records=records_to_calculate_vp)
+    merged_data_df = calculate_volume_profile(merged_data_df, 1, calculate_for_last_records=records_to_calculate_vp, print_time=True)
 
-    merged_data_df = pd.concat([merged_data_with_vp_df, merged_data_df.tail(records_to_calculate_vp)], axis=0, ignore_index=True)
+    if (merged_data_with_vp_df is not None):
+        merged_data_df = pd.concat([merged_data_with_vp_df, merged_data_df.tail(records_to_calculate_vp)], axis=0, ignore_index=True)
 
     print(f"Saving {merged_data_with_vp_file_name}")
     merged_data_df.to_csv(merged_data_with_vp_file_name)
@@ -142,8 +152,6 @@ def add_volume_profiles(ticker:str):
 # ----------------------------
 
 def do_step():
-
-    """
     processes = []
 
     for tikers_batch in cnts.get_all_tickets_batches(cnts.complex_processing_batch_size):
@@ -160,9 +168,8 @@ def do_step():
         print(f"Waiting for '{', '.join(tikers_batch)}' ...")
         for process in processes:
             process.join()
-    """
 
-    add_volume_profiles("RY")
+    # add_volume_profiles("TD")
 
 if __name__ == "__main__":
     do_step()
